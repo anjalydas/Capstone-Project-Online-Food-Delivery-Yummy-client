@@ -46,7 +46,7 @@ function FoodItem(props) {
     <main>
       <section className="md:container md:mx-auto">
         <h2 className="md:container md:mx-auto font-bold text-xl p-6">Delish Delights</h2>
-        <div className="grid grid-cols-3 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-1 gap-4">
+        <div className="grid grid-cols-3 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {foodItems.map((foodItem) => {
             return (
               <div key={foodItem._id} className="bg-white p-4 rounded-lg shadow">

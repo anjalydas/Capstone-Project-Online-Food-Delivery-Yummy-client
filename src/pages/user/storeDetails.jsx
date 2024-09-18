@@ -38,7 +38,7 @@ export function StoreDetails() {
     <main>
       <div key={store._id}>
         <h2 className="md:container md:mx-auto font-bold text-xl p-6">{store.storeName}</h2>
-        <div className="grid grid-cols-3 gap-4">
+        <div >
           {foodItems.length > 0 ? (
             foodItems.map((foodItem) => (
               <FoodItemCard key={foodItem._id} foodItem={foodItem} />
