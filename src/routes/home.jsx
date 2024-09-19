@@ -21,7 +21,7 @@ function Home(props){
     return(
         <main>
     <section className="md:container md:mx-auto ">
-    <img src="./src/public/assets/images/banner.jpeg" alt="banner" className="w-full h-auto" />
+    <img src="./public/assets/images/banner.jpeg" alt="banner" className="w-full h-auto" />
 <h2 className="md:container md:mx-auto font-bold text-xl p-6 ">What's on your mind?</h2>
 
      
