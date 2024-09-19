@@ -15,6 +15,9 @@ function Dropdown() {
       case 'stores':
         navigate('/store');
         break;
+        case 'vender':
+        navigate('/vender-home');
+        break;
       default:
         break;
     }
@@ -33,6 +36,7 @@ function Dropdown() {
         <option value="Quick Links">Quick Links</option>
         <option value="dishes">Dishes</option>
         <option value="stores">Stores</option>
+        <option value="vender">Vender</option>
       </select>
     </div>
   );

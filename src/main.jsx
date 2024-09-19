@@ -31,6 +31,8 @@ import CustomerCare from './pages/admin/customercare.jsx';
 import { SearchProvider } from './context/searchContext.jsx';
 import SearchResults from './pages/user/search.jsx';
 import Store, {loader as storeLoader} from './pages/user/store.jsx';
+import VendorHome from "./pages/vender/venderHome.jsx";
+import AdminHome from "./pages/admin/adminHome.jsx";
 
 const router = createBrowserRouter([
   {
@@ -87,7 +89,7 @@ const router = createBrowserRouter([
             element:<UpdateFoodItem/>
           },
           {
-            path:"delete-foodItem",
+            path:"/delete-foodItem",
             element:<DeleteFoodItem />
           },
           {
@@ -126,11 +128,19 @@ const router = createBrowserRouter([
           {
             path:"/search",
             element: <SearchResults />
-          }
+          },
+        {
+            path: "vender-home",
+            element: <VendorHome />,
+        },
+        {
+          path: "admin-home",
+          element: <AdminHome />,
+      }
     ]
   },
-  
-]);
+]
+);
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
      <Provider store={store}>

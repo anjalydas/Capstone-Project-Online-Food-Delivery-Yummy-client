@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import axios from "axios";
 
 function AddStore() {
@@ -11,6 +11,9 @@ function AddStore() {
   const descriptionRef = useRef(null);
   const dishRef = useRef(null);
 
+  // State to store success or error message
+  const [message, setMessage] = useState("");
+
   function handleSubmit(event) {
     event.preventDefault();
 
@@ -20,7 +23,7 @@ function AddStore() {
     const image = imageRef.current.value;
     const rating = ratingRef.current.value;
     const description = descriptionRef.current.value;
-    const dish = dishRef.current.value.split(",").map(item => item.trim()); // Convert dish string to array
+    const dish = dishRef.current.value.split(",").map((item) => item.trim()); // Convert dish string to array
 
     const data = {
       storeName,
@@ -34,14 +37,35 @@ function AddStore() {
 
     axios
       .post(`${import.meta.env.VITE_API_BASE_URL}/store`, data)
-      .then((response) => console.log(response))
-      .catch((error) => console.log(error));
+      .then((response) => {
+        console.log(response);
+        setMessage("Store added successfully!");
+        // Optionally, clear the form after success
+        storeNameRef.current.value = "";
+        addressRef.current.value = "";
+        contactRef.current.value = "";
+        imageRef.current.value = "";
+        ratingRef.current.value = "";
+        descriptionRef.current.value = "";
+        dishRef.current.value = "";
+      })
+      .catch((error) => {
+        console.log(error);
+        setMessage("Error adding store. Please try again.");
+      });
   }
 
   return (
     <main>
       <form onSubmit={handleSubmit} className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg space-y-4">
         <h2 className="md:container md:mx-auto font-bold text-xl p-6">Add New Store</h2>
+
+        {/* Display success or error message */}
+        {message && (
+          <div className={`p-4 rounded-md ${message.includes("success") ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+            {message}
+          </div>
+        )}
 
         <div>
           <label htmlFor="storeName" className="block text-sm font-medium text-gray-700">
