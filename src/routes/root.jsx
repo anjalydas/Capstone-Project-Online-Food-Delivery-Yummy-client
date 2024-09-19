@@ -55,7 +55,7 @@ function Root() {
           {/* Logo Section */}
           <div className="flex items-center space-x-2">
             <Link to={'/'}>
-              <img src='https://drive.google.com/file/d/1deLUFO05jfCgn9_N315hYd-V9x1rBjP4/view?usp=sharing' alt="Logo" className="h-20 w-20" />
+              <img src='https://photos.app.goo.gl/YiWZnUkCTHNy98x89' alt="Logo" className="h-20 w-20" />
             </Link>
           </div>
           
