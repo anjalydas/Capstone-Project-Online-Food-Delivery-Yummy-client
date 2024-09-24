@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; 
 import { useNavigate, useLocation } from 'react-router-dom';
 
 function PaymentSummary() {
@@ -13,16 +13,30 @@ function PaymentSummary() {
   const [message, setMessage] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
 
+  const [cardDetails, setCardDetails] = useState({
+    cardNumber: '',
+    expiryDate: '',
+    cvv: ''
+  });
+
+  const [upiDetails, setUpiDetails] = useState({
+    upiId: ''
+  });
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Replace this with your actual payment processing logic
-    const paymentDetails = { paymentMethod, amount, status };
 
-    // Simulate a payment process (replace with actual API call)
-    console.log('Payment details submitted:', paymentDetails);
+    // Simulate payment process based on the method selected
+    let paymentDetails = { paymentMethod, amount, status };
+
+    if (paymentMethod === 'Credit Card' || paymentMethod === 'Debit Card') {
+      paymentDetails = { ...paymentDetails, cardDetails };
+    } else if (paymentMethod === 'UPI') {
+      paymentDetails = { ...paymentDetails, upiDetails };
+    }
 
     // Simulate payment success or failure
-    const paymentStatus = 'success'; // Change to 'failure' to test failure
+    const paymentStatus = paymentMethod === 'Cash on Delivery' ? 'success' : 'success'; // Default to success for COD
     const responseMessage = paymentStatus === 'success'
       ? 'Payment Successful! Thank you for your purchase.'
       : 'Payment Failed. Please try again.';
@@ -30,11 +44,20 @@ function PaymentSummary() {
     setMessage(responseMessage);
     setIsSubmitted(true);
 
+    if (paymentStatus === 'success') {
+      // Clear the cart in localStorage
+      localStorage.removeItem('cartItems');
+
+      // Optionally, you can update the cart state globally if needed (depends on your app's structure)
+      // Example: dispatch(clearCartAction()); if you're using Redux or a similar state management tool
+    }
+
     // Redirect to home page after a delay
     setTimeout(() => {
       navigate('/'); // Redirect to home page
     }, 3000); // Adjust delay as needed
-  };
+};
+
 
   return (
     <div className="container mx-auto p-6">
@@ -42,6 +65,7 @@ function PaymentSummary() {
         <form onSubmit={handleSubmit} className="max-w-md mx-auto p-6 bg-white shadow-md rounded-lg">
           <h2 className="text-2xl font-bold mb-4">Payment Details</h2>
 
+          {/* Payment Method Selection */}
           <div className="mb-4">
             <label className="block text-gray-700 font-bold mb-2" htmlFor="paymentMethod">
               Payment Method
@@ -56,11 +80,77 @@ function PaymentSummary() {
               <option value="" disabled>Select a payment method</option>
               <option value="Credit Card">Credit Card</option>
               <option value="Debit Card">Debit Card</option>
-              <option value="PayPal">PayPal</option>
-              <option value="Bank Transfer">Bank Transfer</option>
               <option value="UPI">UPI</option>
+              <option value="Cash on Delivery">Cash on Delivery</option>
             </select>
           </div>
+
+          {/* Dynamic Fields Based on Payment Method */}
+          {(paymentMethod === 'Credit Card' || paymentMethod === 'Debit Card') && (
+            <>
+              <div className="mb-4">
+                <label className="block text-gray-700 font-bold mb-2" htmlFor="cardNumber">
+                  Card Number
+                </label>
+                <input
+                  type="text"
+                  id="cardNumber"
+                  value={cardDetails.cardNumber}
+                  onChange={(e) => setCardDetails({ ...cardDetails, cardNumber: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-md"
+                  placeholder="Enter your card number"
+                  required
+                />
+              </div>
+              <div className="mb-4 flex gap-4">
+                <div>
+                  <label className="block text-gray-700 font-bold mb-2" htmlFor="expiryDate">
+                    Expiry Date
+                  </label>
+                  <input
+                    type="text"
+                    id="expiryDate"
+                    value={cardDetails.expiryDate}
+                    onChange={(e) => setCardDetails({ ...cardDetails, expiryDate: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-md"
+                    placeholder="MM/YY"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-700 font-bold mb-2" htmlFor="cvv">
+                    CVV
+                  </label>
+                  <input
+                    type="text"
+                    id="cvv"
+                    value={cardDetails.cvv}
+                    onChange={(e) => setCardDetails({ ...cardDetails, cvv: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-md"
+                    placeholder="CVV"
+                    required
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
+          {paymentMethod === 'UPI' && (
+            <div className="mb-4">
+              <label className="block text-gray-700 font-bold mb-2" htmlFor="upiId">
+                UPI ID
+              </label>
+              <input
+                type="text"
+                id="upiId"
+                value={upiDetails.upiId}
+                onChange={(e) => setUpiDetails({ ...upiDetails, upiId: e.target.value })}
+                className="w-full px-3 py-2 border rounded-md"
+                placeholder="Enter your UPI ID"
+                required
+              />
+            </div>
+          )}
 
           <div className="mb-4">
             <label className="block text-gray-700 font-bold mb-2" htmlFor="amount">

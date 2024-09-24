@@ -17,24 +17,23 @@ function Login() {
         e.preventDefault();
         setMessage('');
         setError('');
-
+    
         const data = { email, password, role };
-
+    
         try {
             const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/user/login`, data, { withCredentials: true });
             console.log(res);
-
+    
             if (res.data && res.data.success) {
                 setMessage(res.data.message);
                 dispatch(changeLoggedinState(true)); // Update login state
                 
-                const userRole = res.data.role;  // Get role from server response
-                if (userRole === 'admin') {
-                    nav('/admin-home');
-                } else if (userRole === 'vendor') {
-                    nav('/vendor-home');
+                const userRole = res.data.role; 
+                console.log("User Role:", userRole);
+                if (role === 'vendor') {
+                    nav('/vendor-home');  // Navigate to vendor home page
                 } else {
-                    nav('/'); // Default customer home page
+                    setError("Login failed. Invalid role.");  // Handle case when role is unknown
                 }
             } else {
                 setError("Login failed. Invalid response from the server.");
@@ -44,6 +43,7 @@ function Login() {
             dispatch(changeLoggedinState(false));
         }
     }
+    
 
     return (
         <main>

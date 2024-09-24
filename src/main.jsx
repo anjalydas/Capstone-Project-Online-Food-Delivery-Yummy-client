@@ -15,10 +15,9 @@ import SignUp from './pages/user/sign-up.jsx';
 import { Provider } from 'react-redux';
 import store  from './app/store.jsx';
 import UpdateStore , {loader as updateStoreLoader}from './pages/admin/update-store.jsx';
-import AddStore from './pages/vender/create-store.jsx';
-import AddFoodItem from './pages/vender/add-item.jsx';
-import UpdateFoodItem from './pages/vender/update-item.jsx';
-import DeleteFoodItem from './pages/vender/delete-item.jsx';
+import AddStore from './pages/vendor/create-store.jsx';
+import AddFoodItem from './pages/vendor/add-item.jsx';
+import UpdateFoodItem from './pages/vendor/update-item.jsx';
 import Cart from './pages/user/cart.jsx';
 import PaymentSummary from './pages/user/payment.jsx';
 import About from './pages/admin/about.jsx';
@@ -31,8 +30,15 @@ import CustomerCare from './pages/admin/customercare.jsx';
 import { SearchProvider } from './context/searchContext.jsx';
 import SearchResults from './pages/user/search.jsx';
 import Store, {loader as storeLoader} from './pages/user/store.jsx';
-import VendorHome from "./pages/vender/venderHome.jsx";
-import AdminHome from "./pages/admin/adminHome.jsx";
+import VendorHome from "./pages/vendor/vendorHome.jsx";
+import UserRoot from "./pages/admin/root.jsx";
+import LoginPage from "./pages/admin/login.jsx";
+import AdminHome,{loader as adminHomeLoader} from "./pages/admin/home.jsx";
+import User, {loader as userLoader} from "./pages/admin/users.jsx";
+import Unauthorized from "./routes/unauthorised.jsx";
+import DeleteFoodItem from "./pages/vendor/delete-item.jsx"
+import VendorLogin from "./pages/vendor/vendor-login.jsx";
+import VendorSignUp from "./pages/vendor/vendor-signup.jsx";
 
 const router = createBrowserRouter([
   {
@@ -48,6 +54,10 @@ const router = createBrowserRouter([
       {
         path:"about",
         element:<About/>
+      },
+      {
+        path:"unauthorised",
+        element:<Unauthorized/>
       },
       {
         path:"item",
@@ -75,22 +85,6 @@ const router = createBrowserRouter([
             path:"update-store",
             element: <UpdateStore />,
             loader: updateStoreLoader
-          },
-          {
-            path:"create-store",
-            element: <AddStore/>
-          },
-          {
-            path:"add-foodItem",
-            element: <AddFoodItem/>
-          },
-          {
-            path:"edit-foodItem/:foodItemId",
-            element:<UpdateFoodItem/>
-          },
-          {
-            path:"/delete-foodItem",
-            element:<DeleteFoodItem />
           },
           {
             path: "mycart",
@@ -129,16 +123,64 @@ const router = createBrowserRouter([
             path:"/search",
             element: <SearchResults />
           },
-        {
-            path: "vender-home",
-            element: <VendorHome />,
-        },
+        
         {
           path: "admin-home",
           element: <AdminHome />,
       }
     ]
   },
+  
+  {
+    path: "user",
+    element: <UserRoot />,
+    errorElement: <ErrorPage />,
+    children:[
+      {
+        path:"",
+        element: <LoginPage />,
+      },
+      {
+        path:"home-page",
+        element: <AdminHome />,
+        loader: adminHomeLoader
+      },
+      {
+        path:"users",
+        element: <User />,
+        loader: userLoader
+      },
+    ]},
+    {
+      path: "vendor-login",
+      element: <VendorLogin />,
+    },
+      {
+        path: "vendor-home",
+        element:<VendorHome />
+          
+    },
+      {
+        path:"create-store",
+        element: <AddStore/>
+      },
+      {
+        path:"add-foodItem",
+        element: <AddFoodItem/>
+      },
+      {
+        path:"edit-foodItem/:foodItemId",
+        element:<UpdateFoodItem/>
+      },
+      {
+        path:"delete-foodItem",
+        element: <DeleteFoodItem />
+      },
+    
+      {
+        path: "vendor-signup",
+        element: <VendorSignUp />
+      }
 ]
 );
 createRoot(document.getElementById('root')).render(

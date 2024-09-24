@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link, useLoaderData } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useLoaderData, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { addItemsToCart } from '../../features/cart/cartSlice.js';
 
@@ -29,19 +29,42 @@ export async function loader(params) {
 
 function FoodItem(props) {
   const { foodItems = [], stores = [] } = useLoaderData();
-  const dispatch = useDispatch(); // Redux dispatch for adding to cart
-
+  const dispatch = useDispatch(); 
+  const [quantity, setQuantity] = useState(1);
+  const navigate = useNavigate();
   const getStoreName = (storeId) => {
     const store = stores.find((store) => store._id === storeId);
     return store ? store.storeName : 'Store Not Available';
   };
 
-  const handleAddToCart = (foodItem) => {
-    dispatch(addItemsToCart(foodItem)); 
+ 
+  const handleAddToCart = (item) => {
+    const user = JSON.parse(localStorage.getItem('user')); 
+    const token = localStorage.getItem('token'); 
+    
+    // Check if the user is logged in properly
+    if (!token) {
+      navigate('/login');}
+      else{
+        navigate('/mycart')
+      return;
+    }
+  
+    // If user is logged in, proceed with adding to cart
+    const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+    const existingItemIndex = cartItems.findIndex(cartItem => cartItem._id === item._id);
+  
+    if (existingItemIndex > -1) {
+      cartItems[existingItemIndex].quantity += quantity; // If item exists, update quantity
+    } else {
+      cartItems.push({ ...item, quantity }); // Add new item
+    }
+  
+    localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    navigate('/mycart');
   };
-  if (foodItems.length === 0) {
-    return <p>No food items available for this store.</p>;
-  }
+  
+  
   return (
     <main>
       <section className="md:container md:mx-auto">

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function DeleteFoodItem() {
-  const [foodId, setFoodId] = useState(""); // State for foodId
+  const [foodId, setFoodId] = useState(""); 
   const [foodItem, setFoodItem] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -12,25 +12,32 @@ function DeleteFoodItem() {
 
   useEffect(() => {
     if (foodId) {
-      setLoading(true);
-      axios
-        .get(`${import.meta.env.VITE_API_BASE_URL}/item/${foodId}`)
-        .then((response) => {
-          setFoodItem(response.data);
-          setLoading(false);
-        })
-        .catch((err) => {
-          setError("Error fetching food item details. Please try again.");
-          setLoading(false);
-        });
+      fetchFoodItem();
     }
   }, [foodId]);
+
+  const fetchFoodItem = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/item/${foodId}`);
+      if (response.data) {
+        setFoodItem(response.data);
+        setError(null);
+      } else {
+        setError("Food item not found.");
+      }
+    } catch (err) {
+      setError("Error fetching food item details. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleDelete = async () => {
     setLoading(true);
     try {
       await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/item/${foodId}`);
-      navigate("/item"); // Redirect to the list of food items after deletion
+      navigate("/item");
     } catch (err) {
       setError("Error deleting food item. Please try again.");
     } finally {
@@ -54,18 +61,7 @@ function DeleteFoodItem() {
           onSubmit={(e) => {
             e.preventDefault();
             if (foodId) {
-              setConfirm(false);
-              setLoading(true);
-              axios
-                .get(`${import.meta.env.VITE_API_BASE_URL}/item/${foodId}`)
-                .then((response) => {
-                  setFoodItem(response.data);
-                  setLoading(false);
-                })
-                .catch((err) => {
-                  setError("Error fetching food item details. Please try again.");
-                  setLoading(false);
-                });
+              fetchFoodItem();
             }
           }}
         >
@@ -96,8 +92,7 @@ function DeleteFoodItem() {
             <p className="text-lg mb-4 mt-6">
               Are you sure you want to delete the following food item?
             </p>
-            <div className="mb-4">
-              
+            <div className="mb-4" key={foodId}>
               <p><strong>Food Item ID:</strong> {foodItem._id}</p>
               <p><strong>Vendor ID:</strong> {foodItem.storeId}</p>
               <p><strong>Name:</strong> {foodItem.dishName}</p>
@@ -133,5 +128,4 @@ function DeleteFoodItem() {
     </main>
   );
 }
-
 export default DeleteFoodItem;
