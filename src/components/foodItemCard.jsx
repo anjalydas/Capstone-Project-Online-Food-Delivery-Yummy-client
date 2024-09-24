@@ -27,25 +27,25 @@ export function FoodItemCard({ foodItems }) {
         }));
     };
 
-    const handleAddToCart = (item) => {
-        const quantity = quantities[item._id] || 0;
-    
-        if (quantity > 0) {
-            const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-    
-            const existingItem = cartItems.find(cartItem => cartItem._id === item._id);
-            if (existingItem) {
-                existingItem.quantity += quantity;
-            } else {
-                cartItems.push({ ...item, quantity });
-            }
-    
-            localStorage.setItem('cartItems', JSON.stringify(cartItems));
-            navigate('/mycart');
+   const handleAddToCart = (item) => {
+    const quantity = quantities[item._id] || 0;
+
+    if (quantity > 0) {
+        const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+
+        const existingItem = cartItems.find(cartItem => cartItem._id === item._id);
+        if (existingItem) {
+            existingItem.quantity += quantity;
         } else {
-            alert("Please select a quantity before adding to the cart.");
+            cartItems.push({ ...item, quantity });
         }
-    };
+
+        localStorage.setItem('cartItems', JSON.stringify(cartItems));
+        navigate('/mycart');
+    } else {
+        alert("Please select a quantity before adding to the cart.");
+    }
+};
     
 
     return (
