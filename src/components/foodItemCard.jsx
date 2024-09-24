@@ -15,16 +15,38 @@ export function FoodItemCard({ foodItems }) {
     useEffect(() => {
         console.log('Food Items:', foodItems);
     }, [foodItems]);
-
-    const handleAdd = () => setQuantity(prev => prev + 1);
-    const handleSubtract = () => setQuantity(prev => (prev > 0 ? prev - 1 : 0));
+    const [quantities, setQuantities] = useState({});
+    const handleAdd = (itemId) => {
+        setQuantities(prev => ({ ...prev, [itemId]: (prev[itemId] || 0) + 1 }));
+    };
+    
+    const handleSubtract = (itemId) => {
+        setQuantities(prev => ({
+            ...prev,
+            [itemId]: prev[itemId] > 0 ? prev[itemId] - 1 : 0
+        }));
+    };
 
     const handleAddToCart = (item) => {
-        const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-        cartItems.push({ ...item, quantity });
-        localStorage.setItem('cartItems', JSON.stringify(cartItems));
-        navigate('/mycart');
+        const quantity = quantities[item._id] || 0;
+    
+        if (quantity > 0) {
+            const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+    
+            const existingItem = cartItems.find(cartItem => cartItem._id === item._id);
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                cartItems.push({ ...item, quantity });
+            }
+    
+            localStorage.setItem('cartItems', JSON.stringify(cartItems));
+            navigate('/mycart');
+        } else {
+            alert("Please select a quantity before adding to the cart.");
+        }
     };
+    
 
     return (
         <>

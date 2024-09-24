@@ -7,11 +7,11 @@ function Cart() {
   const [foodItems, setFoodItems] = useState([]);
   const [selectedCoupon, setSelectedCoupon] = useState(null);
   const [discount, setDiscount] = useState(0);
-  const [address, setAddress] = useState(""); // New state for delivery address
-  const [error, setError] = useState(""); // New state for error handling
+  const [address, setAddress] = useState(""); // State for delivery address
+  const [error, setError] = useState(""); // State for error handling
   const navigate = useNavigate();
   const userLoggedIn = useSelector((state) => state.login.userLoggedIn);
-  const user = useSelector((state) => state.login.user);
+  const user = useSelector((state) => state.login.user); // Assuming user info is needed
 
   const coupons = [
     { id: 1, discount: 30, label: "30% off for First purchase", validUntil: "30 October 2023" },
@@ -20,20 +20,16 @@ function Cart() {
   ];
 
   useEffect(() => {
-    // Check if user is logged in
     const token = localStorage.getItem('token'); // Assuming token is stored in localStorage
     if (!userLoggedIn) {
-      navigate('/login'); }
-      else{
-        navigate ('/mycart')
-      }
-      return;
-    
-
-    // Fetch cart items from localStorage
-    const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-    setFoodItems(cartItems);
-  }, [navigate]);
+      navigate('/login');
+    } else {
+      // Fetch cart items from localStorage
+      const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+      setFoodItems(cartItems);
+      console.log("Fetched cart items:", cartItems); // Log fetched cart items
+    }
+  }, [navigate, userLoggedIn]);
 
   const updateQuantity = (id, newQuantity) => {
     const updatedItems = foodItems.map(item =>
