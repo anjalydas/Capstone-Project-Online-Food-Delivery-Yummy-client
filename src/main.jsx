@@ -39,6 +39,8 @@ import Unauthorized from "./routes/unauthorised.jsx";
 import DeleteFoodItem from "./pages/vendor/delete-item.jsx"
 import VendorLogin from "./pages/vendor/vendor-login.jsx";
 import VendorSignUp from "./pages/vendor/vendor-signup.jsx";
+import SuccessPage from "./pages/user/success.jsx";
+import CancelPage from "./pages/user/cancel.jsx";
 
 const router = createBrowserRouter([
   {
@@ -90,9 +92,18 @@ const router = createBrowserRouter([
             path: "mycart",
             element:<Cart />
           },
-          {path: "payment-gateway",
+          {path: "/payment/create-checkout-session",
             element: <PaymentSummary />
           },
+              {
+                path:"success",
+                element: <SuccessPage />
+              },
+              {
+                path: "cancel",
+                element: <CancelPage />
+              },
+            
           {
             path: "item/:foodItemId",
             element: <FoodItemDetails />,

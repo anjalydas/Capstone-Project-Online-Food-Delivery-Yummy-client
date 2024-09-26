@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CartItem } from '../../components/cartItem.jsx';
 import { useSelector } from "react-redux";
+import {loadStripe} from '@stripe/stripe-js';
+import axios from "axios";
+
 
 function Cart() {
   const [foodItems, setFoodItems] = useState([]);
@@ -30,7 +33,7 @@ function Cart() {
       console.log("Fetched cart items:", cartItems); // Log fetched cart items
     }
   }, [navigate, userLoggedIn]);
-
+  console.log('User:', user);
   const updateQuantity = (id, newQuantity) => {
     const updatedItems = foodItems.map(item =>
       item._id === id ? { ...item, quantity: Math.max(newQuantity, 0) } : item
@@ -53,13 +56,56 @@ function Cart() {
     setDiscount(coupon.discount);
   };
 
-  const handlePayment = () => {
-    if (!address) {
-      setError("Please enter a delivery address.");
-      return;
+  const makePayment = async () => {
+    
+    try {
+        const stripe = await loadStripe(import.meta.env.VITE_STRIPE_Publishable_key);
+
+        const session = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/payment/create-checkout-session`, {
+            items: foodItems.map(item => ({
+                name: item.dishName,
+                price: item.price,
+                quantity: item.quantity,
+            })),
+            
+        });
+
+        const result = await stripe.redirectToCheckout({
+            sessionId: session.data.sessionId,
+        });
+
+        if (result.error) {
+            console.log('Stripe error:', result.error.message);
+        }
+    } catch (error) {
+        console.error('Payment error:', error);
     }
-    navigate('/payment-gateway', { state: { amount: discountedAmount, address } });
-  };
+};
+
+// New useEffect to handle payment success
+useEffect(() => {
+    const fetchPaymentStatus = async () => {
+        const sessionId = new URLSearchParams(window.location.search).get('session_id');
+        if (sessionId) {
+            try {
+                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/payment/status?session_id=${sessionId}`);
+                if (response.data.success) {
+                    // Payment was successful, clear the cart
+                    localStorage.removeItem('cartItems'); // Clear the cart from local storage
+                    setFoodItems([]); // Clear the state as well
+                    navigate('/'); // Redirect to home page
+                }
+            } catch (error) {
+                console.error('Error fetching payment status:', error);
+            }
+        }
+    };
+
+    fetchPaymentStatus();
+}, [navigate]);
+
+  
+
 
   return (
     <main className="container mx-auto p-6">
@@ -131,7 +177,7 @@ function Cart() {
             <span className="font-semibold">₹ {discountedAmount.toFixed(2)}</span>
           </div>
           <button
-            onClick={handlePayment}
+            onClick={makePayment}
             className="bg-red-500 text-white px-6 py-2 rounded-md w-full mt-4 hover:bg-red-600"
             disabled={foodItems.length === 0}
           >
