@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState } from "react"; 
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { changeLoggedinState } from "../../features/login/loginSlice.js";
@@ -7,28 +6,24 @@ import { changeLoggedinState } from "../../features/login/loginSlice.js";
 function Logout() {
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
-    const nav = useNavigate();
+    const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const handleLogout = async () => {
-      try {
-          const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/user/logout`, {
-              withCredentials: true  // Ensure cookies are included
+        try {
+          const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/logout`, {
+            method: 'POST',
+            credentials: 'include', // Ensure cookies are sent
           });
-  
-          if (res.data.success) {
-              localStorage.removeItem('token');  // Clear token from localStorage
-              dispatch(changeLoggedinState(false));  // Update state
-              nav('/login');  // Redirect to login
-          } else {
-              console.error(res.data.message);  // Handle failure
+      
+          if (response.ok) {
+            // Handle successful logout (e.g., redirect to login page)
           }
-      } catch (err) {
-          console.error('Logout error:', err);
-      }
-  };
-  
-  
+        } catch (error) {
+          console.error('Logout failed', error);
+        }
+      };
+      
 
     return (
         <main>
@@ -46,6 +41,7 @@ function Logout() {
                         >
                             Log Out
                         </button>
+
                         <Link
                             to="/home"
                             className="block px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"

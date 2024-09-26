@@ -11,7 +11,7 @@ function VendorHome() {
                 <nav>
                     <Link to="/vendor-home" className="px-4 py-2 hover:bg-gray-700 rounded">Home</Link>
                     
-                    <Link to="/logout" className="px-4 py-2 hover:bg-gray-700 rounded">Logout</Link>
+                    <Link to="/vendor-logout" className="px-4 py-2 hover:bg-gray-700 rounded">Logout</Link>
                 </nav>
             </div>
         </header> 

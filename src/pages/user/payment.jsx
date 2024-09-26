@@ -1,184 +1,95 @@
-import React, { useState } from 'react'; 
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
 
 function PaymentSummary() {
   const navigate = useNavigate();
   const location = useLocation();
-  
-  // Get amount from location state
-  const { amount } = location.state || { amount: 0 }; // Default to 0 if amount is not passed
-  
-  const [paymentMethod, setPaymentMethod] = useState('');
-  const [status, setStatus] = useState('Pending');
-  const [message, setMessage] = useState('');
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const { amount } = location.state || { amount: 0 };
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [payuFormData, setPayuFormData] = useState({});
 
-  const [cardDetails, setCardDetails] = useState({
-    cardNumber: '',
-    expiryDate: '',
-    cvv: ''
-  });
+  const handlePayUSubmit = async () => {
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/payment`, {
+        amount: amount,
+        productinfo: "Your Product Info",
+        firstname: "Customer Name",
+        email: "Customer Email",
+        phone: "Customer Phone",
+      });
 
-  const [upiDetails, setUpiDetails] = useState({
-    upiId: ''
-  });
+      if (response.data) {
+        setPayuFormData({
+          ...response.data.payuData, // Includes hash, txnid, etc.
+          surl: "your-success-url",
+          furl: "your-failure-url",
+        });
+        console.log("PayU Form Data:", payuFormData);
 
-  const handleSubmit = async (e) => {
+        document.getElementById("payu-form").submit();
+      }
+    } catch (error) {
+      console.error("Error generating PayU hash:", error);
+    }
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Simulate payment process based on the method selected
-    let paymentDetails = { paymentMethod, amount, status };
-
-    if (paymentMethod === 'Credit Card' || paymentMethod === 'Debit Card') {
-      paymentDetails = { ...paymentDetails, cardDetails };
-    } else if (paymentMethod === 'UPI') {
-      paymentDetails = { ...paymentDetails, upiDetails };
+    if (paymentMethod === "PayU") {
+      handlePayUSubmit();
+    } else {
+      // Handle other payment methods
     }
-
-    // Simulate payment success or failure
-    const paymentStatus = paymentMethod === 'Cash on Delivery' ? 'success' : 'success'; // Default to success for COD
-    const responseMessage = paymentStatus === 'success'
-      ? 'Payment Successful! Thank you for your purchase.'
-      : 'Payment Failed. Please try again.';
-
-    setMessage(responseMessage);
-    setIsSubmitted(true);
-
-    if (paymentStatus === 'success') {
-      // Clear the cart in localStorage
-      localStorage.removeItem('cartItems');
-
-      // Optionally, you can update the cart state globally if needed (depends on your app's structure)
-      // Example: dispatch(clearCartAction()); if you're using Redux or a similar state management tool
-    }
-
-    // Redirect to home page after a delay
-    setTimeout(() => {
-      navigate('/'); // Redirect to home page
-    }, 3000); // Adjust delay as needed
-};
-
+  };
 
   return (
     <div className="container mx-auto p-6">
-      {!isSubmitted ? (
-        <form onSubmit={handleSubmit} className="max-w-md mx-auto p-6 bg-white shadow-md rounded-lg">
-          <h2 className="text-2xl font-bold mb-4">Payment Details</h2>
+      <form onSubmit={handleSubmit} className="max-w-md mx-auto p-6 bg-white shadow-md rounded-lg">
+        <h2 className="text-2xl font-bold mb-4">Payment Details</h2>
 
-          {/* Payment Method Selection */}
-          <div className="mb-4">
-            <label className="block text-gray-700 font-bold mb-2" htmlFor="paymentMethod">
-              Payment Method
-            </label>
-            <select
-              id="paymentMethod"
-              value={paymentMethod}
-              onChange={(e) => setPaymentMethod(e.target.value)}
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-indigo-200"
-              required
-            >
-              <option value="" disabled>Select a payment method</option>
-              <option value="Credit Card">Credit Card</option>
-              <option value="Debit Card">Debit Card</option>
-              <option value="UPI">UPI</option>
-              <option value="Cash on Delivery">Cash on Delivery</option>
-            </select>
-          </div>
-
-          {/* Dynamic Fields Based on Payment Method */}
-          {(paymentMethod === 'Credit Card' || paymentMethod === 'Debit Card') && (
-            <>
-              <div className="mb-4">
-                <label className="block text-gray-700 font-bold mb-2" htmlFor="cardNumber">
-                  Card Number
-                </label>
-                <input
-                  type="text"
-                  id="cardNumber"
-                  value={cardDetails.cardNumber}
-                  onChange={(e) => setCardDetails({ ...cardDetails, cardNumber: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-md"
-                  placeholder="Enter your card number"
-                  required
-                />
-              </div>
-              <div className="mb-4 flex gap-4">
-                <div>
-                  <label className="block text-gray-700 font-bold mb-2" htmlFor="expiryDate">
-                    Expiry Date
-                  </label>
-                  <input
-                    type="text"
-                    id="expiryDate"
-                    value={cardDetails.expiryDate}
-                    onChange={(e) => setCardDetails({ ...cardDetails, expiryDate: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-md"
-                    placeholder="MM/YY"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-700 font-bold mb-2" htmlFor="cvv">
-                    CVV
-                  </label>
-                  <input
-                    type="text"
-                    id="cvv"
-                    value={cardDetails.cvv}
-                    onChange={(e) => setCardDetails({ ...cardDetails, cvv: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-md"
-                    placeholder="CVV"
-                    required
-                  />
-                </div>
-              </div>
-            </>
-          )}
-
-          {paymentMethod === 'UPI' && (
-            <div className="mb-4">
-              <label className="block text-gray-700 font-bold mb-2" htmlFor="upiId">
-                UPI ID
-              </label>
-              <input
-                type="text"
-                id="upiId"
-                value={upiDetails.upiId}
-                onChange={(e) => setUpiDetails({ ...upiDetails, upiId: e.target.value })}
-                className="w-full px-3 py-2 border rounded-md"
-                placeholder="Enter your UPI ID"
-                required
-              />
-            </div>
-          )}
-
-          <div className="mb-4">
-            <label className="block text-gray-700 font-bold mb-2" htmlFor="amount">
-              Amount
-            </label>
-            <input
-              type="number"
-              id="amount"
-              value={amount}
-              readOnly
-              className="w-full px-3 py-2 border rounded-md bg-gray-100"
-              placeholder="Amount"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring focus:ring-indigo-300"
+        <div className="mb-4">
+          <label className="block text-gray-700 font-bold mb-2" htmlFor="paymentMethod">
+            Payment Method
+          </label>
+          <select
+            id="paymentMethod"
+            value={paymentMethod}
+            onChange={(e) => setPaymentMethod(e.target.value)}
+            className="w-full px-3 py-2 border rounded-md"
+            required
           >
-            Submit Payment
-          </button>
-        </form>
-      ) : (
-        <div className="max-w-md mx-auto p-6 bg-white shadow-md rounded-lg text-center">
-          <h2 className="text-2xl font-bold mb-4">{message}</h2>
-          <p className="text-gray-700 mb-6">You will be redirected to the home page shortly.</p>
+            <option value="" disabled>Select a payment method</option>
+            <option value="Credit Card">Credit Card</option>
+            <option value="Debit Card">Debit Card</option>
+            <option value="UPI">UPI</option>
+            <option value="PayU">PayU</option>
+            <option value="Cash on Delivery">Cash on Delivery</option>
+          </select>
         </div>
-      )}
+
+        {paymentMethod === "PayU" && (
+          <div>
+            {/* Changed this form to a div */}
+            <form id="payu-form" action="https://secure.payu.in/_payment" method="POST">
+              <input type="hidden" name="key" value={payuFormData.key} />
+              <input type="hidden" name="txnid" value={payuFormData.txnid} />
+              <input type="hidden" name="amount" value={amount} />
+              <input type="hidden" name="productinfo" value={payuFormData.productinfo} />
+              <input type="hidden" name="firstname" value={payuFormData.firstname} />
+              <input type="hidden" name="email" value={payuFormData.email} />
+              <input type="hidden" name="phone" value={payuFormData.phone} />
+              <input type="hidden" name="surl" value={payuFormData.surl} />
+              <input type="hidden" name="furl" value={payuFormData.furl} />
+              <input type="hidden" name="hash" value={payuFormData.hash} />
+              <button type="submit" className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md">
+                Pay with PayU
+              </button>
+            </form>
+          </div>
+        )}
+      </form>
     </div>
   );
 }
