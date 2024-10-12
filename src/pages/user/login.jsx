@@ -22,7 +22,7 @@ function Login() {
         setMessage('');
         setError('');
     
-        const data = { _id, email, password, role };
+        const data = { email, password, role };
         console.log("Login Data:", data);
     
         try {
@@ -34,7 +34,7 @@ function Login() {
     
                 // Ensure user data exists in the response
                 const user = res.data.user;
-                if (user && userId) {
+                if (user) {
                     dispatch(changeLoggedinState({
                         userLoggedIn: true,
                     }));
