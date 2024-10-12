@@ -1,49 +1,69 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { changeLoggedinState } from "../../features/login/loginSlice.js";
 
 function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [role, setRole] = useState('customer');  // Default role
-    const [message, setMessage] = useState('');  
-    const [error, setError] = useState('');      
+    const [role, setRole] = useState('customer'); // Default role
+    const [message, setMessage] = useState('');
+    const [error, setError] = useState('');
     const nav = useNavigate();
     const dispatch = useDispatch();
+    const location = useLocation();
+
+    const redirectPath = new URLSearchParams(location.search).get('redirect') || '/'; // Default to home if no redirect path
+    const { userLoggedIn, userId } = useSelector((state) => state.login);
 
     async function handleLogin(e) {
         e.preventDefault();
         setMessage('');
         setError('');
-
-        const data = { _id, email, password, role };
-
+    
+        const data = { email, password, role };
+        console.log("Login Data:", data);
+    
         try {
             const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/user/login`, data, { withCredentials: true });
-            console.log(res);
-
+            console.log("Response:", res);
+    
             if (res.data && res.data.success) {
                 setMessage(res.data.message);
-                dispatch(changeLoggedinState(true)); // Update login state
-                
-                const userRole = res.data.role;  // Get role from server response
-                if (userRole === 'admin') {
-                    nav('/admin-home');
-                } else if (userRole === 'vendor') {
-                    nav('/vendor-home');
+    
+                // Ensure user data exists in the response
+                const user = res.data.user;
+                if (user && user._id) {
+                    dispatch(changeLoggedinState({
+                        userLoggedIn: true,
+                        userId: user._id,
+                    }));
+                    console.log("Login state updated:", {
+                        userLoggedIn: true,
+                        userId: user._id,
+                    });
+                    localStorage.setItem('token', res.data.token); // Make sure your backend sends a token upon login
+
+                    console.log("Login state updated:", {
+                        userLoggedIn: true,
+                        userId: user._id,
+                    });
+                    // Navigate to home or redirect path after login
+                    nav(redirectPath);
                 } else {
-                    nav('/'); // Default customer home page
+                    setError("User data not found in response");
+                    console.error("User data not found in response");
                 }
             } else {
-                setError("Login failed. Invalid response from the server.");
+                setError(res.data.message || "Login failed");
             }
         } catch (err) {
-            setError("Login failed. Please check your credentials.");
-            dispatch(changeLoggedinState(false));
+            setError(err.response ? err.response.data.message : "Something went wrong");
+            console.error("Error during login:", err);
         }
     }
+    
 
     return (
         <main>
@@ -73,7 +93,6 @@ function Login() {
                         className="w-full px-3 py-2 mt-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" 
                     />
 
-                    {/* Role selection dropdown */}
                     <label htmlFor="role" className="block text-sm font-medium text-gray-700">Role:</label>
                     <select 
                         id="role"
@@ -96,8 +115,8 @@ function Login() {
                     </div>
                 </form>
 
-                {message && <p className="mt-4 text-center text-green-600">{message}</p>}  {/* Success Message */}
-                {error && <p className="mt-4 text-center text-red-600">{error}</p>}  {/* Error Message */}
+                {message && <p className="mt-4 text-center text-green-600">{message}</p>}
+                {error && <p className="mt-4 text-center text-red-600">{error}</p>}
 
                 <p className="mt-6 text-sm text-center text-gray-600">
                     Don't have an account?{" "}
