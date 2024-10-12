@@ -34,7 +34,7 @@ function Login() {
     
                 // Ensure user data exists in the response
                 const user = res.data.user;
-                if (user && user._id) {
+                if (user && userId) {
                     dispatch(changeLoggedinState({
                         userLoggedIn: true,
                         userId: user._id,
