@@ -4,18 +4,18 @@ export const loginSlice = createSlice({
     name: 'login',
     initialState: {
         userLoggedIn: false,
-        user: null, // Add a user field to store user information
+        userId: null,
     },
     reducers: {
         changeLoggedinState: (state, action) => {
-            state.userLoggedIn = action.payload;
+            console.log("Action Payload:", action.payload);
+            state.userLoggedIn = action.payload.userLoggedIn;
+            state.userId = action.payload.userId;
+            console.log("Updated state in slice:", state);
         },
-        setUser: (state, action) => { // New action to set user information
-            state.user = action.payload;
-        }
     }
 });
 
-export const { changeLoggedinState, setUser } = loginSlice.actions;
+export const { changeLoggedinState } = loginSlice.actions;
 
 export default loginSlice.reducer;
