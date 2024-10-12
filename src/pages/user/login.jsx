@@ -37,17 +37,14 @@ function Login() {
                 if (user && userId) {
                     dispatch(changeLoggedinState({
                         userLoggedIn: true,
-                        userId: user._id,
                     }));
                     console.log("Login state updated:", {
                         userLoggedIn: true,
-                        userId: user._id,
                     });
                     localStorage.setItem('token', res.data.token); // Make sure your backend sends a token upon login
 
                     console.log("Login state updated:", {
                         userLoggedIn: true,
-                        userId: user._id,
                     });
                     // Navigate to home or redirect path after login
                     nav(redirectPath);
