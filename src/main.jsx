@@ -10,7 +10,6 @@ import ErrorPage from './error-page.jsx';
 import Home, {loader as homeLoader} from './routes/home.jsx';
 import FoodItem, {loader as itemLoader} from './pages/user/foodItem.jsx';
 import Login from './pages/user/login.jsx';
-import Logout from './pages/user/logout.jsx';
 import SignUp from './pages/user/sign-up.jsx';
 import { Provider } from 'react-redux';
 import store  from './app/store.jsx';
