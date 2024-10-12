@@ -18,12 +18,17 @@ function Root() {
   const handleSearchClick = () => {
     navigate("/search"); // Navigate to the /search page
   };
-
+  const handleLogout = () => {
+    // Clear user session or token (if stored in localStorage, cookies, etc.)
+    localStorage.removeItem("token"); // Assuming token is stored in localStorage
+    dispatch(changeLoggedinState(false)); // Update Redux state
+    navigate("/login"); // Redirect to login page
+  };
   useEffect(() => {
     if (user && user._id) {
       axios
         .get(
-          `${import.meta.env.VITE_API_BASE_URL}/user/check-user/${user._id}`,
+          `${import.meta.env.VITE_API_BASE_URL}/user/${user._id}`,
           { withCredentials: true }
         )
         .then((response) => {
@@ -59,7 +64,7 @@ function Root() {
           {/* Logo Section */}
           <div className="flex items-center space-x-2">
             <Link to={"/"}>
-              <img src="/assets/images/logo.jpg" alt="Logo" className="h-20 w-20" />
+              <img src="/assets/images/logo.png" alt="Logo" className="h-20 w-20" />
             </Link>
           </div>
 
@@ -74,15 +79,13 @@ function Root() {
 
           <div className="flex items-center space-x-4">
             <Dropdown />
-            {/* Conditional rendering for Login/Logout */}
+            
             <div className="flex items-center space-x-1 cursor-pointer">
               {userLoggedIn ? (
-                <Link to={"/logout"}>
-                  <div className="flex items-center space-x-1">
-                    <span className="material-symbols-outlined">account_circle</span>
-                    <span>Logout</span>
-                  </div>
-                </Link>
+                <button onClick={handleLogout} className="flex items-center space-x-1">
+                  <span className="material-symbols-outlined">account_circle</span>
+                  <span>Logout</span>
+                </button>
               ) : (
                 <Link to={"/login"}>
                   <div className="flex items-center space-x-1">
@@ -99,9 +102,9 @@ function Root() {
               </Link>
             </div>
 
-            <div>
+         
               <DarkMode />
-            </div>
+           
           </div>
         </section>
 
@@ -110,8 +113,8 @@ function Root() {
           {foodItems.map((item) => (
             <div key={item._id}>
               <Link to={`/item/${item._id}`}>
-                <img src={item.image} alt={item.dishName} className="h-20 w-20" />
-                <span className="text-gray-500">{item.dishName}</span>
+                <img src={item.image} alt={item.dishName} className="h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20 object-cover rounded-full mb-2" />
+                <span className="text-xs sm:text-sm md:text-base text-gray-700 font-semibold">{item.dishName}</span>
               </Link>
             </div>
           ))}
