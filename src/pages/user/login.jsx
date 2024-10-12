@@ -18,7 +18,7 @@ function Login() {
         setMessage('');
         setError('');
 
-        const data = { email, password, role };
+        const data = { _id, email, password, role };
 
         try {
             const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/user/login`, data, { withCredentials: true });
