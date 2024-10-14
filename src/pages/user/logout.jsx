@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { changeLoggedinState } from "../../features/login/loginSlice.js";
+import { clearCart } from "../../features/cart/cartSlice.js"; // Import the clearCart action
 
 function Logout() {
     const [message, setMessage] = useState('');
@@ -11,19 +12,36 @@ function Logout() {
 
     const handleLogout = async () => {
         try {
-          const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/logout`, {
-            method: 'POST',
-            credentials: 'include', // Ensure cookies are sent
-          });
-      
-          if (response.ok) {
-            // Handle successful logout (e.g., redirect to login page)
-          }
-        } catch (error) {
-          console.error('Logout failed', error);
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/logout`, {
+                method: 'GET',
+                credentials: 'include'  // Ensure cookies are sent with the request
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                // Clear token and update login state
+                localStorage.removeItem('token');
+                dispatch(changeLoggedinState(false));
+                
+                // Clear the cart
+                dispatch(clearCart());
+
+                // Set success message
+                setMessage('You have been logged out successfully.');
+
+                // Redirect to login after 2 seconds
+                setTimeout(() => {
+                    navigate('/login');
+                }, 2000);
+            } else {
+                setError('Logout failed. Please try again.');
+            }
+        } catch (err) {
+            setError('An error occurred during logout.');
+            console.error('Logout error:', err);
         }
-      };
-      
+    };
 
     return (
         <main>
@@ -32,8 +50,8 @@ function Logout() {
                     <h2 className="text-2xl font-bold text-gray-800">Are you sure you want to log out?</h2>
 
                     <div className="space-y-4">
-                        {message && <p className="text-green-600">{message}</p>}  {/* Success Message */}
-                        {error && <p className="text-red-600">{error}</p>}  {/* Error Message */}
+                        {message && <p className="text-green-600">{message}</p>}
+                        {error && <p className="text-red-600">{error}</p>}
 
                         <button
                             onClick={handleLogout}

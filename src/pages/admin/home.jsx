@@ -78,7 +78,7 @@ export function AdminHome() {
         </div>
 
         <div className="text-center my-6">
-          <Link to={"/add-store"}>
+          <Link to={"/user/create-store"}>
             <button className="px-4 py-2 bg-green-600 text-white font-bold rounded-lg">
               Add New Store
             </button>

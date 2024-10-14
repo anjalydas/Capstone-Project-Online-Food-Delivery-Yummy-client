@@ -26,17 +26,17 @@ function Home(props){
 
      
 
-     <div className="grid grid-cols-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
      {
      limitedFoodItems.map((foodItem)=>{
                 return(
                 
     <div key={foodItem._id} className="bg-white p-4 rounded-lg shadow">
-     <Link to={`/item/${foodItem._id}`}> <img className="w-full h-48 object-cover" src={foodItem.image} alt="foodImage"  /></Link>
-                     <div className="w-1/2 pl-6">
-                     <h2 className="text-xl font-bold mb-2">{foodItem.dishName}</h2>
+     <Link to={`/item/${foodItem._id}`}> <img className="w-full h-40 md:h-48 object-cover rounded-t-lg" src={foodItem.image} alt="foodImage"  /></Link>
+                     <div className="flex flex-col items-center mt-4">
+                     <h2 className="text-sm md:text-lg font-bold text-center mb-2">{foodItem.dishName}</h2>
                   
-                   <p className="text-pink-700 text-lg font-semibold mt-2 whitespace-nowrap">
+                   <p className="text-pink-700 text-base md:text-lg font-semibold mt-2">
           ₹ {foodItem.price.toFixed(2)}
         </p>
                      </div>
@@ -52,7 +52,7 @@ function Home(props){
     </section>
     <section className="md:container md:mx-auto ">
      <h2 className="md:container md:mx-auto font-bold text-xl p-6 ">STORES</h2>
-     <div className="grid grid-cols-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
      {
      stores.map(store=>{
                 return(

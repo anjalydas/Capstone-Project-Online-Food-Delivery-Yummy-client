@@ -10,16 +10,13 @@ import ErrorPage from './error-page.jsx';
 import Home, {loader as homeLoader} from './routes/home.jsx';
 import FoodItem, {loader as itemLoader} from './pages/user/foodItem.jsx';
 import Login from './pages/user/login.jsx';
-import Logout from './pages/user/logout.jsx';
 import SignUp from './pages/user/sign-up.jsx';
 import { Provider } from 'react-redux';
 import store  from './app/store.jsx';
-import UpdateStore , {loader as updateStoreLoader}from './pages/admin/update-store.jsx';
 import AddStore from './pages/vendor/create-store.jsx';
 import AddFoodItem from './pages/vendor/add-item.jsx';
 import UpdateFoodItem from './pages/vendor/update-item.jsx';
 import Cart from './pages/user/cart.jsx';
-import PaymentSummary from './pages/user/payment.jsx';
 import About from './pages/admin/about.jsx';
 import FoodItemDetails, {loader as foodItemDetailsLoader} from './pages/user/foodItemDetails.jsx';
 import StoreDetails, {loader as storeDetailsLoader}  from './pages/user/storeDetails.jsx';
@@ -41,6 +38,13 @@ import VendorLogin from "./pages/vendor/vendor-login.jsx";
 import VendorSignUp from "./pages/vendor/vendor-signup.jsx";
 import SuccessPage from "./pages/user/success.jsx";
 import CancelPage from "./pages/user/cancel.jsx";
+import VendorRoot from "./pages/vendor/vendorRoot.jsx";
+import UpdateStore, {loader as updateStoreLoader} from "./pages/vendor/update-store.jsx";
+import OrderPage from "./pages/vendor/orderPage.jsx";
+import MyOrders from "./pages/user/orders.jsx";
+import Logout from "./pages/user/logout.jsx";
+import VendorLogout from "./pages/vendor/vendor-logout.jsx";
+import AddNewStore from "./pages/admin/add-store.jsx";
 
 const router = createBrowserRouter([
   {
@@ -77,24 +81,22 @@ const router = createBrowserRouter([
           },
           {
             path:"logout",
-            element: <Logout />
+            element: <Logout />,
           },
           {
             path:"sign-up",
             element: <SignUp />
           },
-          {
-            path:"update-store",
-            element: <UpdateStore />,
-            loader: updateStoreLoader
-          },
+          
           {
             path: "mycart",
             element:<Cart />
           },
-          {path: "/payment/create-checkout-session",
-            element: <PaymentSummary />
+          {
+            path:"orders",
+            element: <MyOrders/>
           },
+         
               {
                 path:"success",
                 element: <SuccessPage />
@@ -151,6 +153,7 @@ const router = createBrowserRouter([
         path:"",
         element: <LoginPage />,
       },
+      
       {
         path:"home-page",
         element: <AdminHome />,
@@ -161,10 +164,22 @@ const router = createBrowserRouter([
         element: <User />,
         loader: userLoader
       },
+      {
+        path:"create-store",
+        element: <AddNewStore/>
+      },
     ]},
+    {
+      path: "vendor",
+      element: <VendorRoot />,
+      children:[
     {
       path: "vendor-login",
       element: <VendorLogin />,
+    },
+    {
+      path: "vendor-logout",
+      element: <VendorLogout />,
     },
       {
         path: "vendor-home",
@@ -174,6 +189,11 @@ const router = createBrowserRouter([
       {
         path:"create-store",
         element: <AddStore/>
+      },
+      {
+        path:"update-store",
+        element: <UpdateStore />,
+        loader: updateStoreLoader
       },
       {
         path:"add-foodItem",
@@ -191,7 +211,13 @@ const router = createBrowserRouter([
       {
         path: "vendor-signup",
         element: <VendorSignUp />
+      },
+      {
+        path: "orders",
+        element: <OrderPage />
       }
+    ]
+  }
 ]
 );
 createRoot(document.getElementById('root')).render(

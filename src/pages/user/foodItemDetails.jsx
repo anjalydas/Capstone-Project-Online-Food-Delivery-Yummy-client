@@ -13,8 +13,8 @@ export async function loader({ params }) {
 function FoodItemDetails() {
   const { foodItem } = useLoaderData();
   const [quantity, setQuantity] = useState(1);
-  const [shippingAddress, setShippingAddress] = useState('');
   const navigate = useNavigate(); 
+
   useEffect(() => {
     console.log('FoodItem:', foodItem);
   }, [foodItem]);
@@ -23,43 +23,38 @@ function FoodItemDetails() {
     return <p>Loading food item details...</p>;
   }
 
-  
   const handleAddToCart = (item) => {
-    const user = JSON.parse(localStorage.getItem('user')); 
-    const token = localStorage.getItem('token'); 
-    
+    const token = localStorage.getItem('token');
+
     // Check if the user is logged in properly
     if (!token) {
-      navigate('/login');}
-      else{
-        navigate('/mycart')
-      return;
+      navigate('/login');
+      return; // Prevent further execution
     }
-  
+
     // If user is logged in, proceed with adding to cart
     const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
     const existingItemIndex = cartItems.findIndex(cartItem => cartItem._id === item._id);
-  
+
     if (existingItemIndex > -1) {
       cartItems[existingItemIndex].quantity += quantity; // If item exists, update quantity
     } else {
       cartItems.push({ ...item, quantity }); // Add new item
     }
-  
+
     localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    console.log("Updated cart items:", cartItems); // Debug log to check items in the cart
     navigate('/mycart');
   };
-  
 
   return foodItem ? (
     <main className="container mx-auto p-6">
       <section className="flex flex-col lg:flex-row gap-6">
-       
         <div className="flex-shrink-0">
           <img
             src={foodItem.image}
             alt={foodItem.dishName}
-            className="w-full h-48 object-cover rounded-lg shadow-lg "
+            className="w-full h-48 object-cover rounded-lg shadow-lg"
           />
         </div>
 
@@ -100,17 +95,6 @@ function FoodItemDetails() {
                   +
                 </button>
               </div>
-            </div>
-
-            <div className="mb-4">
-              <label htmlFor="shippingAddress" className="block text-lg mb-2">Shipping Address:</label>
-              <input
-                type="text"
-                id="shippingAddress"
-                value={shippingAddress}
-                onChange={(e) => setShippingAddress(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded"
-              />
             </div>
 
             <button

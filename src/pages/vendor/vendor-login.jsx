@@ -1,17 +1,21 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { changeLoggedinState } from "../../features/login/loginSlice.js";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { changeLoggedinState } from "../../features/login/loginSlice";
 
-function Login() {
+function VendorLogin() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [role, setRole] = useState('customer');  // Default role
-    const [message, setMessage] = useState('');  
-    const [error, setError] = useState('');      
+    const [role, setRole] = useState('customer'); // Default role
+    const [message, setMessage] = useState('');
+    const [error, setError] = useState('');
     const nav = useNavigate();
     const dispatch = useDispatch();
+    const location = useLocation();
+
+    const redirectPath = new URLSearchParams(location.search).get('redirect') || '/vendor/vendor-home'; // Default to home if no redirect path
+    const { userLoggedIn, userId } = useSelector((state) => state.login);
 
     async function handleLogin(e) {
         e.preventDefault();
@@ -28,12 +32,27 @@ function Login() {
                 setMessage(res.data.message);
                 dispatch(changeLoggedinState(true)); // Update login state
                 
-                const userRole = res.data.role; 
-                console.log("User Role:", userRole);
-                if (role === 'vendor') {
-                    nav('/vendor-home');  // Navigate to vendor home page
+                const user = res.data.user;
+                if (user && user._id) {
+                    dispatch(changeLoggedinState({
+                        userLoggedIn: true,
+                        userId: user._id,
+                    }));
+                    localStorage.setItem('token', res.data.token); // Assuming token is stored in localStorage
+
+                    console.log("Login state updated:", {
+                        userLoggedIn: true,
+                        userId: user._id,
+                    });
+
+                    // Navigate to home or redirect path after login
+                    if (role === 'vendor') {
+                        nav('/vendor/vendor-home');  // Navigate to vendor home page
+                    } else {
+                        setError("Login failed. Invalid role.");
+                    }
                 } else {
-                    setError("Login failed. Invalid role.");  // Handle case when role is unknown
+                    setError("Login failed. User data is missing.");
                 }
             } else {
                 setError("Login failed. Invalid response from the server.");
@@ -43,7 +62,6 @@ function Login() {
             dispatch(changeLoggedinState(false));
         }
     }
-    
 
     return (
         <main>
@@ -101,7 +119,7 @@ function Login() {
 
                 <p className="mt-6 text-sm text-center text-gray-600">
                     Don't have an account?{" "}
-                    <Link to={'/sign-up'} className="font-medium text-indigo-600 hover:text-indigo-500">
+                    <Link to={'/vendor/vendor-signup'} className="font-medium text-indigo-600 hover:text-indigo-500">
                         Sign up
                     </Link>
                 </p>
@@ -110,4 +128,4 @@ function Login() {
     );
 }
 
-export default Login;
+export default VendorLogin;

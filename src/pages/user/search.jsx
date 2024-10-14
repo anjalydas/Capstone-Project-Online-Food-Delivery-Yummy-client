@@ -9,6 +9,7 @@ export function SearchResults() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate(); 
+
   const handleSearch = async () => {
     if (searchQuery.trim()) {
       setLoading(true);
@@ -36,30 +37,30 @@ export function SearchResults() {
     }
   };
 
-  const handleAddToCart = (item) => { 
-    const token = localStorage.getItem('token'); 
+  const handleAddToCart = (item, quantity) => {
+    const token = localStorage.getItem('token');
 
+    // Check if the user is logged in properly
     if (!token) {
-      alert('You need to log in to add items to the cart.');
-      navigate('/login'); // Redirect to the login page
-      return;
+      navigate('/login');
+      return; // Prevent further execution
     }
+
+    // If user is logged in, proceed with adding to cart
     const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-    
-    // Check if the item already exists in the cart
-    const existingItem = cartItems.find(cartItem => cartItem._id === item._id);
-    
-    if (existingItem) {
-      // If the item already exists, update its quantity
-      existingItem.quantity += 1;
+    const existingItemIndex = cartItems.findIndex(cartItem => cartItem._id === item._id);
+
+    if (existingItemIndex > -1) {
+      cartItems[existingItemIndex].quantity += quantity; // If item exists, update quantity
     } else {
-      // Otherwise, add the item to the cart with quantity 1
-      cartItems.push({ ...item, quantity: 1 });
+      cartItems.push({ ...item, quantity }); // Add new item
     }
 
     localStorage.setItem('cartItems', JSON.stringify(cartItems));
-    alert(`${item.dishName} has been added to your cart.`);
+    console.log("Updated cart items:", cartItems); // Debug log to check items in the cart
+    navigate('/mycart');
   };
+
   return (
     <div className="flex flex-col items-center mt-6">
       <div className="flex items-center mb-4 w-full max-w-lg">
@@ -86,19 +87,29 @@ export function SearchResults() {
         <div className="w-full max-w-lg">
           <ul>
             {searchResults.map((item) => (
-              <li key={item._id} className="mb-4 p-4 border border-gray-200 rounded-md">
+              <li key={item._id} className="mb-4 p-4 border border-gray-200 rounded-md flex items-center">
                 <img
-    src={item.image} 
-    alt={item.dishName}
-    className="w-24 h-24 object-cover rounded-md mr-4" 
-  />
-  <div>
-                <h3 className="text-xl font-semibold">{item.dishName}</h3>
-                <p className="text-gray-700">{item.description}</p>
-                <p className="font-bold">Price: ${item.price}</p>
+                  src={item.image} 
+                  alt={item.dishName}
+                  className="w-24 h-24 object-cover rounded-md mr-4" 
+                />
+                <div className="flex-grow">
+                  <h3 className="text-xl font-semibold">{item.dishName}</h3>
+                  <p className="text-gray-700">{item.description}</p>
+                  <p className="font-bold">Price: ₹{item.price}</p>
+                  <div className="flex items-center mt-2">
+                    <span className="mr-2">Quantity:</span>
+                    <input
+                      type="number"
+                      min="1"
+                      defaultValue={1}
+                      onChange={(e) => item.quantity = parseInt(e.target.value) || 1}
+                      className="w-12 text-center border border-gray-300 rounded"
+                    />
+                  </div>
                 </div>
                 <button
-                  onClick={() => handleAddToCart(item)}
+                  onClick={() => handleAddToCart(item, item.quantity)}
                   className="bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 ml-4"
                 >
                   Add to Cart

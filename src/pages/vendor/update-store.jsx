@@ -1,11 +1,26 @@
 import React, { useRef } from "react";
 import { Link, useLoaderData } from "react-router-dom";
-export async function loader (params) {
- 
-  const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/store/${params.storeId}`)
-  const {stores} = await response.json()
 
- return { stores}
+export async function loader({ params }) {
+  const { storeId } = params;
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/item/${item._id}?storeName=${storeId}`);
+    const foodItemsData = await response.json();
+
+    const storeResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/store/${storeId}`);
+    const storeData = await storeResponse.json();
+
+    if (!foodItemsData || !foodItemsData.foodItems || !storeData) {
+      throw new Error("Invalid data from API");
+    }
+    return {
+      foodItems: foodItemsData.foodItems,
+      store: storeData,
+    };
+  } catch (error) {
+    console.error("API Fetch Error:", error);
+    return { foodItems: [], store: null };
+  }
 }
 
 function UpdateStore(props){
@@ -31,7 +46,7 @@ function UpdateStore(props){
    contactNumber: contactNumber,
    dish: dish
   }
-  axios.post(`${import.meta.env.VITE_API_BASE_URL}/store`, data)
+  axios.patch(`${import.meta.env.VITE_API_BASE_URL}/store/${params.storeId}`, data)
   .then(responce => console.log(responce))
   .catch(error => console.log(error))
 }

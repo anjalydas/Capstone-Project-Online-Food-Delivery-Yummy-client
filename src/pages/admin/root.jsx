@@ -18,7 +18,7 @@ function UserRoot(props) {
           <nav>
             <ul className="flex space-x-6">
               <li>
-                <Link to="/" className="text-lg hover:text-gray-300">
+                <Link to="/user/home-page" className="text-lg hover:text-gray-300">
                   Home
                 </Link>
               </li>
@@ -29,7 +29,7 @@ function UserRoot(props) {
                 </Link>
               </li>
               <li>
-                <Link to="/Login" className="text-lg hover:text-gray-300">
+                <Link to="/user" className="text-lg hover:text-gray-300">
                   Login
                 </Link>
               </li>

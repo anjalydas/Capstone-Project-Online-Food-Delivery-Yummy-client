@@ -111,7 +111,7 @@ function VendorSignUp() {
                 {generalError && <p className="mt-4 text-center text-red-600">{generalError}</p>}
                 <p className="mt-6 text-sm text-center text-gray-600">
                     Already have an account?
-                  <Link to={'/login'} className="font-medium text-indigo-600 hover:text-indigo-500"> Sign in</Link> 
+                  <Link to={'/vendor/vendor-login'} className="font-medium text-indigo-600 hover:text-indigo-500"> Sign in</Link> 
                 </p>
             </section>
         </main>

@@ -7,16 +7,69 @@
   margin: 0;
   box-sizing: border-box;
 }
-.bg-gray-50 {
-  background-color: #f9fafb;
-}
-.dark .bg-gray-50 {
-  background-color: #1f2937;
+/* Light mode (default) styles */
+body {
+  background-color: white;
+  color: black;
 }
 
-.text-gray-500 {
-  color: #6b7280;
+/* Dark mode styles */
+.dark body {
+  background-color: #1a202c; /* Dark background */
+  color: #f7fafc; /* Light text */
 }
-.dark .text-gray-500 {
-  color: #d1d5db;
+
+.dark header, .dark footer, .dark section {
+  background-color: #2d3748; /* Darker sections */
+  color: #f7fafc;
+}
+
+.dark nav {
+  background-color: #2d3748;
+}
+
+.dark .btn {
+  background-color: #ff007f; /* Highlight buttons */
+  color: white;
+}
+
+.dark .btn:hover {
+  background-color: #ff409f; /* Lighter hover effect */
+}
+
+.dark input {
+  background-color: #2d3748;
+  color: #f7fafc;
+  border: 1px solid #4a5568;
+}
+
+.dark input::placeholder {
+  color: #cbd5e0; /* Light placeholder */
+}
+
+.dark .card {
+  background-color: #2d3748;
+  color: #f7fafc;
+  border: 1px solid #4a5568;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+}
+
+.dark .icon {
+  color: #f7fafc; /* Ensure icons are visible */
+}
+
+.dark .search-box {
+  background-color: #4a5568;
+  color: #f7fafc;
+}
+
+.dark .dropdown {
+  background-color: #4a5568;
+  color: #f7fafc;
+  border-color: #4a5568;
+}
+
+.dark .dropdown:hover {
+  background-color: #2d3748;
+  color: #e2e8f0;
 }

@@ -15,8 +15,11 @@ function Dropdown() {
       case 'stores':
         navigate('/store');
         break;
+        case 'myOrders':
+        navigate('/orders');
+        break;
         case 'vendor':
-        navigate('/vendor-login');
+        navigate('vendor/vendor-login');
         break;
       default:
         break;
@@ -31,11 +34,12 @@ function Dropdown() {
       <select
         id="dropdown"
         onChange={handleChange}
-        className="w-full px-3 py-2 mt-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className="w-full px-3 py-2 mt-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-pink-600"
       >
         <option value="Quick Links">Quick Links</option>
         <option value="dishes">Dishes</option>
         <option value="stores">Stores</option>
+        <option value="myOrders">My Orders</option>
         <option value="vendor">Vendor</option>
       </select>
     </div>

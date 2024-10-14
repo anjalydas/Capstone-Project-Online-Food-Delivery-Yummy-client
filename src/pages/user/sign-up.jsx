@@ -45,7 +45,7 @@ function SignUp() {
                 if (errorMessage) {
                     setGeneralError(errorMessage);
                 } else {
-                    setGeneralError('Signup failed. Please try again.');
+                    setGeneralError();
                 }
             });
     }

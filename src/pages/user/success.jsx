@@ -1,17 +1,12 @@
 import React, { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const SuccessPage = () => {
-  const navigate = useNavigate();
 
-  // Automatically redirect to the homepage after 5 seconds
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      navigate("/");
-    }, 5000);
-
-    return () => clearTimeout(timer); // Cleanup the timer on component unmount
-  }, [navigate]);
+ 
+    useEffect(() => {
+      sessionStorage.clear(); 
+  }, []);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-green-50 text-gray-800 p-4">

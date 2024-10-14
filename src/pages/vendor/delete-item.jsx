@@ -20,24 +20,28 @@ function DeleteFoodItem() {
     setLoading(true);
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/item/${foodId}`);
-      if (response.data) {
-        setFoodItem(response.data);
+      console.log(response.data); // Debugging line to verify the API response
+      if (response.data.success && response.data.foodItem) {
+        setFoodItem(response.data.foodItem); // Access response.data.foodItem
         setError(null);
       } else {
         setError("Food item not found.");
+        setFoodItem(null); // Clear food item state if not found
       }
     } catch (err) {
       setError("Error fetching food item details. Please try again.");
+      setFoodItem(null); // Clear food item state in case of error
     } finally {
       setLoading(false);
     }
   };
+  
 
   const handleDelete = async () => {
     setLoading(true);
     try {
       await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/item/${foodId}`);
-      navigate("/item");
+      navigate("/vendor/vendor-home");
     } catch (err) {
       setError("Error deleting food item. Please try again.");
     } finally {
@@ -94,7 +98,7 @@ function DeleteFoodItem() {
             </p>
             <div className="mb-4" key={foodId}>
               <p><strong>Food Item ID:</strong> {foodItem._id}</p>
-              <p><strong>Vendor ID:</strong> {foodItem.storeId}</p>
+              <img src={foodItem.image} alt="food image" /> 
               <p><strong>Name:</strong> {foodItem.dishName}</p>
               <p><strong>Vendor:</strong> {foodItem.storeName}</p>
               <p><strong>Price:</strong> ₹{foodItem.price}</p>
