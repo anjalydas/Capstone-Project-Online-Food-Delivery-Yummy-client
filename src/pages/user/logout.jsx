@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { changeLoggedinState } from "../../features/login/loginSlice.js";
-import { clearCart } from "../../features/cart/cartSlice.js"; // Import the clearCart action
 
 function Logout() {
     const [message, setMessage] = useState('');
@@ -24,8 +23,7 @@ function Logout() {
                 localStorage.removeItem('token');
                 dispatch(changeLoggedinState(false));
                 
-                // Clear the cart
-                dispatch(clearCart());
+               
 
                 // Set success message
                 setMessage('You have been logged out successfully.');

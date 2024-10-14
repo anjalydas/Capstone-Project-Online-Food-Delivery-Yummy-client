@@ -45,6 +45,7 @@ import MyOrders from "./pages/user/orders.jsx";
 import Logout from "./pages/user/logout.jsx";
 import VendorLogout from "./pages/vendor/vendor-logout.jsx";
 import AddNewStore from "./pages/admin/add-store.jsx";
+import AdminSignUp from "./pages/admin/admin-signup.jsx";
 
 const router = createBrowserRouter([
   {
@@ -153,6 +154,10 @@ const router = createBrowserRouter([
       {
         path:"",
         element: <LoginPage />,
+      },
+      {
+        path:"signup",
+        element: <AdminSignUp />,
       },
       
       {

@@ -44,6 +44,16 @@ export function AdminHome() {
 
   return (
     <main>
+       <section>
+          <div className="container mx-auto p-6">
+            <h1 className="text-3xl font-bold mb-6">Welcome to the Admin Panel!</h1>
+            <p className="mb-6">
+              From here, you can manage stores, users, and monitor the system. Use the tools
+              provided to keep the platform running smoothly.
+            </p>
+            
+          </div>
+        </section>
       <section className="md:container md:mx-auto p-6">
        
         {/* Section for Store Management */}
@@ -96,16 +106,7 @@ export function AdminHome() {
         </div>
 
         {/* Welcome Message and Info Section */}
-        <section>
-          <div className="container mx-auto p-6">
-            <h1 className="text-3xl font-bold mb-6">Welcome to the Admin Panel!</h1>
-            <p className="mb-6">
-              From here, you can manage stores, users, and monitor the system. Use the tools
-              provided to keep the platform running smoothly.
-            </p>
-            
-          </div>
-        </section>
+       
       </section>
     </main>
   );

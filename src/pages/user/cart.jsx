@@ -1,48 +1,44 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { CartItem } from '../../components/cartItem.jsx'; // Ensure this component is defined
+import { CartItem } from '../../components/cartItem.jsx';
 import { useDispatch, useSelector } from "react-redux";
 import { loadStripe } from '@stripe/stripe-js';
 import axios from "axios";
+import { changeLoggedinState } from "../../features/login/loginSlice.js";
 
 function Cart() {
   const [foodItems, setFoodItems] = useState([]);
   const [selectedCoupon, setSelectedCoupon] = useState(null);
   const [discount, setDiscount] = useState(0);
-  const [address, setAddress] = useState("");
-  const [error, setError] = useState("");
+  const [address, setAddress] = useState(""); 
+  const [error, setError] = useState(""); 
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const userLoggedIn = useSelector((state) => state.login.userLoggedIn);
-  const user = useSelector((state) => state.login.user)
+
   const coupons = [
     { id: 1, discount: 30, label: "30% off for First purchase", validUntil: "30 October 2023" },
     { id: 2, discount: 20, label: "20% off for purchase above Rs. 1000", validUntil: "30 October 2023" },
     { id: 3, discount: 10, label: "10% off for purchase above Rs. 500", validUntil: "30 October 2023" },
   ];
+
   useEffect(() => {
-    const checkUser = async () => {
-      try {
-        if (user && user._id) {
-          const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/user/${user._id}`, { withCredentials: true });
-          if (res.data && res.data.success) {
-            localStorage.setItem('token', res.data.token);
-          }
-        }
+    const token = localStorage.getItem('token'); 
+    if (!userLoggedIn) {
+      navigate('/login');
+    } else {
+      // Fetch cart items from local storage
+      const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+      setFoodItems(cartItems);
+      console.log("Fetched cart items:", cartItems); 
+    }
+  }, [navigate, userLoggedIn]);
 
-        if (!userLoggedIn) {
-          navigate('/login');
-        } else {
-          const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-          setFoodItems(cartItems);
-        }
-      } catch (error) {
-        console.error("User check error:", error);
-      }
-    };
-
-    checkUser();
-  }, [navigate, userLoggedIn, user]);
+  // Function to clear the cart
+  const clearCart = () => {
+    setFoodItems([]);
+    localStorage.removeItem('cartItems'); 
+  };
 
   const updateQuantity = (id, newQuantity) => {
     const updatedItems = foodItems.map(item =>
@@ -58,8 +54,12 @@ function Cart() {
     localStorage.setItem('cartItems', JSON.stringify(updatedItems));
   };
 
-  const amount = foodItems.reduce((total, item) => total + item.price * item.quantity, 0);
-  const discountedAmount = amount - (amount * discount / 100);
+  const amount = foodItems.reduce((total, item) => {
+    const itemTotal = (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 0);
+    return total + itemTotal;
+  }, 0);
+
+  const discountedAmount = isNaN(amount) ? 0 : amount - (amount * discount / 100);
 
   const handleSelectCoupon = (coupon) => {
     setSelectedCoupon(coupon);
@@ -78,8 +78,18 @@ function Cart() {
       });
 
       const result = await stripe.redirectToCheckout({ sessionId: session.data.sessionId });
+      
       if (result.error) {
         console.log('Stripe error:', result.error.message);
+      }
+      else{
+        // Clear the cart items after successful payment
+        clearCart();
+        dispatch(changeLoggedinState({
+          userLoggedIn: true,
+          userId: user._id,
+      }));
+        await createOrder();
       }
     } catch (error) {
       console.error('Payment error:', error);
@@ -93,10 +103,8 @@ function Cart() {
         try {
           const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/payment/status?session_id=${sessionId}`);
           if (response.data.success) {
-            await createOrder();
-            localStorage.removeItem('cartItems');
-            dispatch(clearCart());
-            navigate('/order-confirmation');
+            
+            navigate('/orders'); // Navigate to orders page
           } else {
             console.error('Payment was not successful:', response.data);
           }
@@ -107,7 +115,7 @@ function Cart() {
     };
 
     fetchPaymentStatus();
-  }, [dispatch, navigate]);
+  }, [navigate]);
 
   const createOrder = async () => {
     const userId = JSON.parse(localStorage.getItem('user'))._id;
@@ -121,7 +129,7 @@ function Cart() {
     };
 
     try {
-      const createOrderResponse = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/orders/${userId}`, orderData);
+      const createOrderResponse = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/orders?user=${userId}`, orderData);
       console.log('Order created successfully:', createOrderResponse.data);
     } catch (error) {
       console.error('Error creating order:', error);
@@ -136,19 +144,38 @@ function Cart() {
         <div className="space-y-4">
           {foodItems.length > 0 ? (
             foodItems.map(item => (
-              <CartItem 
-                key={item._id}
-                item={item}
-                onQuantityChange={updateQuantity}
-                onDelete={handleDelete}
-              />
+              <div key={item._id} className="flex items-center border-b pb-4">
+               
+                <div className="flex-grow">
+                  
+                  <CartItem 
+                    item={item}
+                    onQuantityChange={updateQuantity}
+                    onDelete={handleDelete}
+                  />
+                </div>
+              </div>
             ))
           ) : (
-            <p>Your cart is empty.</p>
+            <p className="text-gray-500">Your cart is empty.</p>
           )}
         </div>
       </section>
 
+      {/* Delivery Address Section */}
+      <section className="mb-6">
+        <h2 className="text-xl font-semibold mb-2">Delivery Address</h2>
+        <input 
+          type="text" 
+          className="border border-gray-300 rounded-md w-full p-2"
+          placeholder="Enter your delivery address"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+        />
+        {error && <p className="text-red-500 mt-2">{error}</p>}
+      </section>
+
+      {/* Coupon Selection Section */}
       <section className="mb-6">
         <h2 className="text-xl font-semibold mb-2">Available Coupons</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -185,26 +212,12 @@ function Cart() {
             <span className="font-medium">Total:</span>
             <span className="font-semibold">₹ {discountedAmount.toFixed(2)}</span>
           </div>
-          <div className="mt-4">
-            <label htmlFor="address" className="block text-sm font-medium">Delivery Address:</label>
-            <input
-              type="text"
-              id="address"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              className="mt-1 p-2 border rounded w-full"
-              placeholder="Enter your address"
-              required
-            />
-          </div>
           <button
+            className="bg-blue-500 text-white py-2 px-4 rounded mt-4"
             onClick={makePayment}
-            className="bg-red-500 text-white px-6 py-2 rounded-md w-full mt-4 hover:bg-red-600"
-            disabled={foodItems.length === 0 || !address}
           >
-            Proceed to Payment
+            Checkout
           </button>
-          {error && <p className="text-red-500 mt-2">{error}</p>}
         </div>
       </section>
     </main>

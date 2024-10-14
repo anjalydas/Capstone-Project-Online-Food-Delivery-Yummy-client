@@ -13,7 +13,7 @@ export async function loader() {
     const data = await response.json();
     console.log(data); // Log the entire response for debugging
 
-    return { users: data.user || [] }; // Ensure you access the correct property
+    return { user: data.user || [] }; // Ensure you access the correct property
   } catch (error) {
     console.error("API Fetch Error:", error);
     throw error; // or return a default value like { users: [] }
@@ -22,24 +22,23 @@ export async function loader() {
 
 // User component to manage and display users
 export function User() {
-  const { users: initialUsers } = useLoaderData(); // Load initial user data
-  console.log("Initial Users: ", initialUsers); // Log initial users data
-
-  const [users, setUsers] = useState(initialUsers || []); // State for users
-  console.log("Users State: ", users); // Log the users state
-
-  const [selectedUser, setSelectedUser] = useState(null);
+  const { user } = useLoaderData(); // Load initial user data
+  const [users, setUsers] = useState(user); // Initialize local state for users
   const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({ name: "", email: "", mobile: "" });
+  const [formData, setFormData] = useState({ _id: "", name: "", email: "", mobile: "" });
   const navigate = useNavigate();
 
-  // Handle update user action
   const handleUpdate = (user) => {
-    setSelectedUser(user);
-    setFormData({ name: user.name, email: user.email, mobile: user.mobile });
+    console.log("Selected user for update:", user); // Log user object
+    setFormData({ 
+      userId: user._id, 
+      name: user.name, 
+      email: user.email, 
+      mobile: user.mobile, 
+    });
     setShowModal(true);
   };
-
+  
   // Handle delete user action
   const handleDelete = async (userId) => {
     try {
@@ -47,7 +46,7 @@ export function User() {
         method: 'DELETE',
       });
       if (response.ok) {
-        setUsers(users.filter(user => user._id !== userId)); // Update the users state
+        setUsers((prevUsers) => prevUsers.filter((u) => u._id !== userId)); // Update the users state
       } else {
         console.error("Failed to delete user");
       }
@@ -56,30 +55,36 @@ export function User() {
     }
   };
 
-  // Handle form submission for updating user
-  const handleUpdateSubmit = async (e) => {
-    e.preventDefault();
+  const handleUpdateSubmit = async (event) => {
+    event.preventDefault(); // Prevent form submission
+  
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/${selectedUser._id}`, {
-        method: 'PUT',
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/${formData.userId}`, {
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          user: formData.userId, // Send the user ID as "user"
+          name: formData.name,
+          email: formData.email,
+          mobile: formData.mobile,
+        }),
       });
-      
+  
       if (response.ok) {
         const updatedUser = await response.json();
-        setUsers(users.map(user => (user._id === updatedUser._id ? updatedUser : user))); // Update users state
+        setUsers((prevUsers) => prevUsers.map((u) => (u._id === updatedUser.user._id ? updatedUser.user : u))); // Update users state with the new user data
         setShowModal(false);
       } else {
-        console.error("Failed to update user");
+        const errorData = await response.json(); // Log the error details from the server
+        console.error("Failed to update user:", errorData);
       }
     } catch (error) {
       console.error("Update Error:", error);
     }
   };
-
+  
   return (
     <main>
       <section className="md:container md:mx-auto p-6">
@@ -96,12 +101,12 @@ export function User() {
             </tr>
           </thead>
           <tbody>
-            {users.length === 0 ? (
+            {users.length === 0 ? ( // Use the local state here
               <tr>
                 <td colSpan="6" className="text-center">No users found.</td>
               </tr>
             ) : (
-              users.map((user) => (
+              users.map((user) => ( // Use the local state here
                 <tr key={user._id}>
                   <td className="px-4 py-2">
                     <img

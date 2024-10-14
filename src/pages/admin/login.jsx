@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { changeLoggedinState } from "../../features/login/loginSlice.js";
 
 function Login() {
@@ -12,13 +12,17 @@ function Login() {
     const [error, setError] = useState('');      
     const nav = useNavigate();
     const dispatch = useDispatch();
+    const location = useLocation();
+
+    const redirectPath = new URLSearchParams(location.search).get('redirect') || '/vendor/vendor-home'; // Default to home if no redirect path
+    const { userLoggedIn, userId } = useSelector((state) => state.login);
 
     async function handleLogin(e) {
         e.preventDefault();
         setMessage('');
         setError('');
 
-        const data = {  email, password, role };
+        const data = { email, password, role };
 
         try {
             const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/user/login`, data, { withCredentials: true });
@@ -26,18 +30,30 @@ function Login() {
 
             if (res.data && res.data.success) {
                 setMessage(res.data.message);
-                dispatch(changeLoggedinState(true)); // Update login state
-                
-                const userRole = res.data.role;  // Get role from server response
-                if (userRole === 'admin') {
-                    nav('/admin-home');
-                } else if (userRole === 'vendor') {
-                    nav('/vendor-home');
+                const user = res.data.user;
+
+                if (user && user._id) {
+                    dispatch(changeLoggedinState({
+                        userLoggedIn: true,
+                        userId: user._id,
+                    }));
+                    localStorage.setItem('token', res.data.token); // Assuming token is stored in localStorage
+
+                    console.log("Login state updated:", {
+                        userLoggedIn: true,
+                        userId: user._id,
+                    });
+
+                    if (role === 'admin') {
+                        nav('/user/home-page');
+                    } else if (role === 'vendor') {
+                        nav('/vendor-home');
+                    } else {
+                        nav('/user/home-page'); // Default customer home page
+                    }
                 } else {
-                    nav('/user/home-page'); // Default customer home page
+                    setError("Login failed. Invalid response from the server.");
                 }
-            } else {
-                setError("Login failed. Invalid response from the server.");
             }
         } catch (err) {
             setError("Login failed. Please check your credentials.");
