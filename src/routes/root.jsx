@@ -25,7 +25,7 @@ function Root() {
     navigate("/login"); // Redirect to login page
   };
   useEffect(() => {
-    if (user && user._id) {
+    if (user ) {
       axios
         .get(
           `${import.meta.env.VITE_API_BASE_URL}/user/${user._id}`,
