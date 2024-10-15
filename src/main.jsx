@@ -100,7 +100,7 @@ const router = createBrowserRouter([
           },
          
               {
-                path:"success?session_id=session_id",
+                path:"success",
                 element: <SuccessPage />
               },
               {
