@@ -129,7 +129,7 @@ function Cart() {
     };
 
     try {
-      const createOrderResponse = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/orders?session_id=${session_id}`, orderData);
+      const createOrderResponse = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/orders?user=${userId}`, orderData);
       console.log('Order created successfully:', createOrderResponse.data);
     } catch (error) {
       console.error('Error creating order:', error);
