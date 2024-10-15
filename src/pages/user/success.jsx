@@ -2,40 +2,51 @@ import React, { useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { changeLoggedinState } from "../../features/login/loginSlice";
 import { useDispatch, useSelector } from "react-redux";
+import axios from 'axios';
 
 const SuccessPage = () => {
   const clearCart = () => {
     localStorage.removeItem('cartItems'); 
   };
+  
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const userLoggedIn = useSelector((state) => state.login.userLoggedIn);
 
-dispatch(changeLoggedinState({
-  userLoggedIn: true
-}));
-const createOrder = async (params) => {
-  
-
-  try {
-    const createOrderResponse = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/orders?session_id={CHECKOUT_SESSION_ID}`, orderData);
-    console.log('Order created successfully:', createOrderResponse.data);
-  } catch (error) {
-    console.error('Error creating order:', error);
-    setError('Failed to create order. Please try again.');
-  }
-};
-
   useEffect(() => {
-    // Redirect to the orders page after 5 seconds
+    // Update login state on success page load
+    dispatch(changeLoggedinState({ userLoggedIn: true }));
+
+    // Get session_id from URL
+    const session_id = new URLSearchParams(window.location.search).get("session_id");
+
+    // Create order function
+    const createOrder = async () => {
+      if (session_id) {
+        try {
+          const orderData = { /* Add necessary order details here */ };
+          const createOrderResponse = await axios.post(
+            `${import.meta.env.VITE_API_BASE_URL}/orders?session_id=${session_id}`, 
+            orderData
+          );
+          console.log('Order created successfully:', createOrderResponse.data);
+        } catch (error) {
+          console.error('Error creating order:', error);
+        }
+      }
+    };
+
+    // Call createOrder and clear cart
+    createOrder();
+    clearCart();
+
+    // Redirect to the orders page after 10 seconds
     const timer = setTimeout(() => {
       navigate("/orders");
     }, 10000);
 
-    clearCart();
-    createOrder
     return () => clearTimeout(timer);
-  }, [navigate]);
+  }, [dispatch, navigate]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-green-50 text-gray-800 p-4">
@@ -59,7 +70,7 @@ const createOrder = async (params) => {
           Thank you for your purchase. Your order is confirmed.
         </p>
         <p className="text-sm mt-2 text-gray-600">
-          You will be redirected to your orders page in 5 seconds...
+          You will be redirected to your orders page in 10 seconds...
         </p>
         <Link
           to="/orders"
