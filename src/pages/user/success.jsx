@@ -17,8 +17,9 @@ const SuccessPage = () => {
     // Update login state on success page load
     dispatch(changeLoggedinState({ userLoggedIn: true }));
 
-    // Get session_id from URL
-    const session_id = new URLSearchParams(window.location.search).get("session_id");
+    const location = useLocation();
+    const query = new URLSearchParams(location.search);
+    const sessionId = query.get('session_id'); 
 
     // Create order function
     const createOrder = async () => {
