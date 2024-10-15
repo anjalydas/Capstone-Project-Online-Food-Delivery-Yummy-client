@@ -18,7 +18,7 @@ const createOrder = async (params) => {
   
 
   try {
-    const createOrderResponse = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/orders?user=${userId}`, orderData);
+    const createOrderResponse = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/orders?session_id={CHECKOUT_SESSION_ID}`, orderData);
     console.log('Order created successfully:', createOrderResponse.data);
   } catch (error) {
     console.error('Error creating order:', error);
