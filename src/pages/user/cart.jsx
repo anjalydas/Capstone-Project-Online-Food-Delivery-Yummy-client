@@ -101,7 +101,7 @@ function Cart() {
       const sessionId = new URLSearchParams(window.location.search).get('session_id');
       if (sessionId) {
         try {
-          const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/payment/session-status?session_id=${sessionId}`);
+          const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/payment/session-status?session_id=${sessionId}`);
           if (response.data.success) {
             
             navigate('/orders'); // Navigate to orders page
