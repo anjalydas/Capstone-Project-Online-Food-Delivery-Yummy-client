@@ -30,6 +30,7 @@ const SuccessPage = () => {
             orderData
           );
           console.log('Order created successfully:', createOrderResponse.data);
+          console.log("Session ID:", session_id);
         } catch (error) {
           console.error('Error creating order:', error);
         }
