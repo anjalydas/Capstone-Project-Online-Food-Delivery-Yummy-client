@@ -100,7 +100,7 @@ function Cart() {
         orderData
       );
       console.log("Order Data:", orderData);
-      clearCart();
+      
       console.log('Order created successfully:', createOrderResponse.data);
       console.log("Order Data:", orderData);
       console.log("Cart Items for Payment:", cartItems);
@@ -122,6 +122,7 @@ function Cart() {
 
       if (result.success) {
         console.log('Payment Successful');
+        clearCart();
       } else {
         console.log('Stripe error:', result.error.message);
       }
