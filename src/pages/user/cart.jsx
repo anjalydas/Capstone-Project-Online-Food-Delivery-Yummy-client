@@ -107,6 +107,8 @@ function Cart() {
       
       const stripe = await loadStripe(import.meta.env.VITE_STRIPE_Publishable_key);
       const session = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/payment/create-checkout-session`, {
+  success_url: 'https://capstone-project-online-food-delivery-yummy-client.vercel.app/success',
+  cancel_url: 'https://capstone-project-online-food-delivery-yummy-client.vercel.app/cancel',
         items: cartItems.map(item => ({
           name: item.dishName,
           price: item.price,
