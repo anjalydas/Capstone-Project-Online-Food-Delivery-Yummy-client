@@ -88,7 +88,6 @@ function Cart() {
           dishName: item.dishName,
           quantity: item.quantity,
           totalPrice: item.price,
-          image: item.image
         })),
         shippingAddress: address,
         paymentMethod: 'Credit Card',
@@ -111,14 +110,12 @@ function Cart() {
         items: cartItems.map(item => ({
           name: item.dishName,
           price: item.price,
-          image: item.image,
           quantity: item.quantity,
         })),
       });
 
       setSessionId(session.data.sessionId);
       localStorage.setItem('paymentSessionId', session.data.sessionId);
-
       const result = await stripe.redirectToCheckout({ sessionId: session.data.sessionId });
 
       if (result.success) {
@@ -130,8 +127,7 @@ function Cart() {
       console.error('Payment error:', error);
     }
   };
-
-  return (
+      return (
     <main className="container mx-auto p-6">
       <section className="mb-6">
         <h2 className="text-2xl font-bold mb-4">Shopping Cart</h2>
