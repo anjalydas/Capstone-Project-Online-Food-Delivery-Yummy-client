@@ -123,6 +123,7 @@ function Cart() {
       if (result.success) {
         console.log('Payment Successful');
         clearCart();
+        navigate('/success')
       } else {
         console.log('Stripe error:', result.error.message);
       }
