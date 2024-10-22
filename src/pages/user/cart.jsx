@@ -100,13 +100,15 @@ function Cart() {
         orderData
       );
       console.log("Order Data:", orderData);
-      clearCart();
+      
       console.log('Order created successfully:', createOrderResponse.data);
       console.log("Order Data:", orderData);
       console.log("Cart Items for Payment:", cartItems);
       
       const stripe = await loadStripe(import.meta.env.VITE_STRIPE_Publishable_key);
       const session = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/payment/create-checkout-session`, {
+  success_url: 'https://capstone-project-online-food-delivery-yummy-client.vercel.app/payment/success',
+  cancel_url: 'https://capstone-project-online-food-delivery-yummy-client.vercel.app/payment/cancel',
         items: cartItems.map(item => ({
           name: item.dishName,
           price: item.price,
@@ -120,6 +122,8 @@ function Cart() {
 
       if (result.success) {
         console.log('Payment Successful');
+        clearCart();
+        navigate('/success')
       } else {
         console.log('Stripe error:', result.error.message);
       }
